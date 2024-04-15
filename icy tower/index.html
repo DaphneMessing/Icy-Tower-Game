@@ -15,6 +15,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
+
         // Game settings
         const gravity = 0.5;
         const friction = 0.8;
@@ -23,6 +24,7 @@
         //score
         let score=0;
 
+    
         // Player
         let player = {
             x: canvas.width / 2,
@@ -36,6 +38,7 @@
         };
 
         // Platforms
+        let platIndex=1;
         let platforms = [];
         while (platforms.length < 10) {
             let potentialPlatform = {
@@ -43,7 +46,10 @@
             y: canvas.height - (100 * platforms.length) - 50,
             width: 100,
             height: 10,
-            landed: false // Indicates if the player has landed on this platform before
+            landed: false, // Indicates if the player has landed on this platform before
+            timeLanded:0, // Time tracker for how long the player has stood on the platform
+            falling: false, // State to determine if the platform is falling
+            index: platIndex++  
             };
 
             let overlaps = platforms.some(platform => {
@@ -113,6 +119,9 @@
                             });
                         }while (overlaps);
                         platform.landed = false; // Reset the 'landed' flag when platform respawns
+                        platform.falling = false;
+                        platform.timeLanded = 0;
+                        platform.index = platIndex++;
                     }
                 });
             }
@@ -129,8 +138,8 @@
                 player.jumping = false;
                 player.velY = 0;
             }
-
             // Platform collision
+            let onPlatform= false; // Flag to check if the player is currently on any platform
             platforms.forEach(platform => {
                 if (
                     player.x < platform.x + platform.width &&
@@ -145,11 +154,28 @@
                     if (!platform.landed) { // Check if the platform was landed on before
                         platform.landed = true;
                         score++; // Increment score if landing on a new platform
-                        console.log('Score: ' + score); // Log score to console or update a score display
                     }
-                }
-            });
+                     // Check if the player just landed on the platform
+                    if (!onPlatform) {
+                        platform.timeLanded += 1 / 60;  // Increment time only for the platform the player is on
+                        onPlatform = true;  // Set the flag that player is on a platform
+                    }
+                    if (platform.timeLanded >= 3 && !platform.falling) {
+                        platform.falling = true;  // Mark the platform as falling after 3 seconds
+                    }
 
+                }else if (!platform.falling) {
+                        platform.timeLanded =0; // Reset time if the player is not on the platform
+                }
+                    // Handle falling platforms
+                if (platform.falling) {
+                        platform.y += 5;  // Accelerate the fall
+                }
+            }); 
+                 // Remove platforms that have fallen below the canvas
+                platforms = platforms.filter(platform => platform.y < canvas.height);
+               
+            
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -158,9 +184,17 @@
             ctx.fillRect(player.x, player.y, player.width, player.height);
 
             // Draw platforms
-            platforms.forEach(platform => {
-                ctx.fillStyle = 'black';
+            platforms.forEach((platform,index) => {
+                ctx.fillStyle = platform.falling ? 'gray' : 'black'; // Change color if falling
                 ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+            
+
+                // Check if the platform index is divisible by 10 for labeling
+                if (platform.index % 10 === 0 || platform.index===1 ) {
+                    ctx.fillStyle = "yellow"; // Set the text color
+                    ctx.font = "14px Arial"; // Set the font for the text
+                    ctx.fillText("Platform " + platform.index, platform.x + 10, platform.y + platform.height / 2 + 5);
+                }   
             });
 
             // Draw score
