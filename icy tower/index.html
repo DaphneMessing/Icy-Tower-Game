@@ -37,33 +37,44 @@
             jumping: false
         };
 
+
         // Platforms
-        let platIndex=1;
+        let platIndex = 1;
         let platforms = [];
-        while (platforms.length < 10) {
+        const verticalGap = 120; // Set maximum vertical gap between platforms
+        let baseY = canvas.height - 100;  // Starting Y position for the first platform
+
+        for (let i = 0; i < 10; i++) {
+            // Decrease the Y position by the verticalGap for each subsequent platform
+            let newY = baseY - (verticalGap * i);
+
             let potentialPlatform = {
-            x: Math.random() * (canvas.width - 50),
-            y: canvas.height - (100 * platforms.length) - 50,
-            width: 100,
-            height: 10,
-            landed: false, // Indicates if the player has landed on this platform before
-            timeLanded:0, // Time tracker for how long the player has stood on the platform
-            falling: false, // State to determine if the platform is falling
-            index: platIndex++  
+                x: Math.random() * (canvas.width - 50),  // Random X position
+                y: newY,                                 // Calculated Y position
+                width: 100,
+                height: 10,
+                landed: false,
+                timeLanded: 0,
+                falling: false,
+                index: platIndex++                      // Increment index for each new platform
             };
 
-            let overlaps = platforms.some(platform => {
-            return (
-                potentialPlatform.x < platform.x + platform.width &&
-                potentialPlatform.x + potentialPlatform.width > platform.x &&
-                potentialPlatform.y < platform.y + platform.height &&
-                potentialPlatform.y + potentialPlatform.height > platform.y
-            );
-            });
+            // Check for vertical overlaps and adjust
+            let validPosition = false;
+            while (!validPosition) {
+                let overlaps = platforms.some(platform => {
+                    return Math.abs(platform.y - potentialPlatform.y) < potentialPlatform.height;
+                });
 
-            if (!overlaps) {
-            platforms.push(potentialPlatform);
+                if (!overlaps) {
+                    validPosition = true;
+                } else {
+                    // Adjust Y position to avoid overlap
+                    potentialPlatform.y -= verticalGap; // Move up further if there is an overlap
+                }
             }
+
+            platforms.push(potentialPlatform);
         }
 
         // Key Listener
@@ -100,14 +111,20 @@
 
             // Screen scroll
             if (player.y < canvas.height / 4) {
-                player.y += Math.abs(player.velY);
+                let deltaY = Math.abs(player.velY);
+                player.y += deltaY;
                 platforms.forEach(platform => {
-                    platform.y += Math.abs(player.velY);
+                    platform.y += deltaY;
+                });
+                platforms.forEach(platform => {
                     if (platform.y > canvas.height) {
+                        // Find the minimum y position among current platforms
+                        let minY = Math.min(...platforms.map(p => p.y));
+
                         let overlaps;
                         do {
                             overlaps = false;
-                            platform.y = 0;
+                            platform.y = minY - verticalGap; // Position above the highest platform
                             platform.x = Math.random() * (canvas.width - platform.width);
                             platforms.forEach(other => {
                             if (platform !== other && platform.x < other.x + other.width &&
@@ -153,6 +170,7 @@
                     player.y = platform.y - player.height;
                     if (!platform.landed) { // Check if the platform was landed on before
                         platform.landed = true;
+                        
                         score++; // Increment score if landing on a new platform
                     }
                      // Check if the player just landed on the platform
