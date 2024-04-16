@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Platformer Game with Screen Scroll</title>
     <style>
-        body, html { margin: 0; padding: 0; overflow: hidden; }
+        body, html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100%; /* Ensure the body takes full viewport height */
+        display: flex; /* Use flexbox to align children */
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        
+    }
         #gameCanvas { background-color: #87CEEB; }
     </style>
 </head>
@@ -29,7 +38,7 @@
         // Player
         let player = {
             x: canvas.width / 2,
-            y: canvas.height - 150,
+            y: canvas.height - 100,
             width: 20,
             height: 20,
             speed: 5,
@@ -45,6 +54,9 @@
         const verticalGap = 120; // Set maximum vertical gap between platforms
         let baseY = canvas.height - 100;  // Starting Y position for the first platform
 
+        function generatePlatforms() {
+            platforms = []; // Clear existing platforms if any
+        let currentBaseY = baseY;
         for (let i = 0; i < 10; i++) {
             // Decrease the Y position by the verticalGap for each subsequent platform
             let newY = baseY - (verticalGap * i);
@@ -75,7 +87,6 @@
                 enemy:enemy
             }
 
-
             // Check for vertical overlaps and adjust
             let validPosition = false;
             while (!validPosition) {
@@ -93,6 +104,9 @@
 
             platforms.push(potentialPlatform);
         }
+        }
+        // Call to generate platforms initially
+        generatePlatforms();
 
         // Key Listener
         let keys = [];
@@ -168,20 +182,6 @@
                 }
             }, { once: true });
 
-
-            // // Listen for clicks to restart game
-            // canvas.addEventListener('click', function handleClick(event) {
-            //     const mouseX = event.clientX - canvas.offsetLeft;
-            //     const mouseY = event.clientY - canvas.offsetTop;
-            //     // Calculate the bottom boundary of the canvas dynamically
-            //     const canvasMiddleY = canvas.height / 2;
-            //     // Check if the click is within the button's bounding box
-            //     if (mouseX >= 140 && mouseX <= 240 &&
-            //         mouseY >= canvas.height / 2 + 50 && mouseY <= canvas.height / 2 + 90) {
-            //         canvas.removeEventListener('click', handleClick); // Remove the listener to avoid multiple triggers
-            //         restartGame();
-            //     }
-            // }, { once: true });
 }
        
         function restartGame() {
@@ -193,61 +193,12 @@
             player.velX = 0;
             player.velY = 0;
             platIndex = 1;
-            platforms = [];
+            
             landedIndex=0;    
-            baseY = canvas.height - 100;  // Starting Y position for the first platform
-
-            for (let i = 0; i < 10; i++) {
-                // Decrease the Y position by the verticalGap for each subsequent platform
-                let newY = baseY - (verticalGap * i);
-                let hasEnemy = Math.random() < 0.05; // 5% chance of having an enemy
-                let enemy=null;
-
-                if (hasEnemy) {
-                    let enemyType = Math.random() < 0.5 ? 'Type1' : 'Type2';
-                    enemy = {
-                        type: enemyType,
-                        x: Math.random() * (100 - 80), // Random X within platform width
-                        y: -20, // Enemy is just above the platform
-                        speed: enemyType === 'Type2' ? (Math.random() * 2 - 1) * 2 : 0, // Only Type2 moves
-                        width: 20,
-                        height: 20
-                    };
-                }
-                        
-                let potentialPlatform = {
-                    x: Math.random() * (canvas.width - 50),  // Random X position
-                    y: newY,                                 // Calculated Y position
-                    width: 100,
-                    height: 10,
-                    landed: false,
-                    timeLanded: 0,
-                    falling: false,
-                    index: platIndex++, // Increment index for each new platform
-                    enemy:enemy
-                }
-
-
-                // Check for vertical overlaps and adjust
-                let validPosition = false;
-                while (!validPosition) {
-                    let overlaps = platforms.some(platform => {
-                        return Math.abs(platform.y - potentialPlatform.y) < potentialPlatform.height;
-                    });
-
-                    if (!overlaps) {
-                        validPosition = true;
-                    } else {
-                        // Adjust Y position to avoid overlap
-                        potentialPlatform.y -= verticalGap; // Move up further if there is an overlap
-                    }
-                }
-
-                platforms.push(potentialPlatform);
-            }
-
+            
+            // Regenerate platforms
+            generatePlatforms();
             requestAnimationFrame(updateGame);
-
         }
 
         function updateGame() {
