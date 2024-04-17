@@ -84,8 +84,15 @@
                 falling: false,
                 index: platIndex++, // Increment index for each new platform
                 enemy:enemy,
-                originalY: baseY - (verticalGap * i)
+                originalY: baseY - (verticalGap * i),
+                moving: Math.random() < 0.06,  // 6% chance of the platform moving
+                distance:25,// Maximum movement distance in pixels
+                direction:1, // Direction of movement: 1 for up, -1 for down
+                currentMove: 0  // Current position in the movement cycle
             }
+
+                
+       
 
 
             // Check for vertical overlaps and adjust
@@ -225,7 +232,11 @@
                     falling: false,
                     index: platIndex++, // Increment index for each new platform
                     enemy:enemy,
-                    originalY: baseY - (verticalGap * i)
+                    originalY: baseY - (verticalGap * i),
+                    moving: Math.random() < 0.06,  // 6% chance of the platform moving
+                    distance:25,// Maximum movement distance in pixels
+                    direction:1, // Direction of movement: 1 for up, -1 for down
+                    currentMove: 0  // Current position in the movement cycle
                 }
 
 
@@ -340,6 +351,17 @@
             // Platform collision
             
             platforms.forEach(platform => {
+
+                // Handle moving platforms
+                if (platform.moving) {
+                    platform.y += platform.direction;
+                    platform.currentMove += platform.direction;
+
+                    // Reverse direction if the platform has moved its full amplitude in either direction
+                    if (Math.abs(platform.currentMove) >= platform.distance) {
+                        platform.direction *= -1;
+                    }
+                }
                  
                 if (
                     player.x < platform.x + platform.width &&
