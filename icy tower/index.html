@@ -67,7 +67,7 @@
             let platformWidth = isWider ? widerWidth : standardWidth;
             let hasEnemy = Math.random() < 0.05; // 5% chance of having an enemy
             let enemy=null;
-            let hasStar = Math.random() < 0.9;  // 20% chance of having a star
+            let hasStar = Math.random() < 0.2;  // 20% chance of having a star
 
                     
             let potentialPlatform = {
@@ -96,10 +96,11 @@
                     speed: enemyType === 'Type2' ? (Math.random() * 2 - 1) * 2 : 0, // Only Type2 moves
                     width: 20,
                     height: 20
-                };
+                }
             }
+            else if(hasStar){
             // Optionally add a star
-            if (hasStar) {
+            
                 potentialPlatform.star = {
                     x: potentialPlatform.x + potentialPlatform.width / 2 - 10, // Center on platform
                     y: potentialPlatform.y - 20,  // Place above the platform
@@ -224,7 +225,7 @@
                 let newY = baseY - (verticalGap * i);
                 let hasEnemy = Math.random() < 0.05; // 5% chance of having an enemy
                 let enemy=null;
-                let hasStar = Math.random() < 0.9;
+                let hasStar = Math.random() < 0.2;
                 let isWider = Math.random() < 0.1;  // 10% chance of the platform being wider
                 let platformWidth = isWider ? widerWidth : standardWidth;  // Choose width based on random chance      
                 let potentialPlatform = {
@@ -254,9 +255,9 @@
                         width: 20,
                         height: 20
                     };
-                }
+                }else if(hasStar){
                 // Optionally add a star
-                if (hasStar) {
+                // if (hasStar) {
                     potentialPlatform.star = {
                         x: potentialPlatform.x + potentialPlatform.width / 2 - 10, // Center on platform
                         y: potentialPlatform.y - 20,  // Place above the platform
@@ -332,6 +333,7 @@
 
                         if (Math.random() < 0.05) {  // Chance to add an enemy
                             let enemyType = Math.random() < 0.5 ? 'Type1' : 'Type2';
+                            platform.star = null; // No star on this platform
                             platform.enemy = {
                                 type: enemyType,
                                 x: Math.random() * (platform.width - 80),
@@ -340,10 +342,9 @@
                                 width: 20,
                                 height: 20
                             };
-                        } else {
+
+                        }else if(Math.random<0.2){
                             platform.enemy = null;  // Clear enemy if not adding a new one
-                        }
-                        if (Math.random() < 0.9) { 
                             platform.star = {
                                 x: platform.x + platform.width / 2 - 10,
                                 y: platform.y - 20,
@@ -351,10 +352,11 @@
                                 height: 20,
                                 active: true
                             };
-                        } else {
+                        }
+                        else{
+                            platform.enemy = null;
                             platform.star = null; // No star on this platform
                         }
-                        
                         
 
                         let overlaps;
@@ -397,18 +399,18 @@
 
                 // Handle moving platforms
                 if (platform.moving) {
+                    const oldY = platform.y;  // Store old y position to calculate movement delta
                     platform.y += platform.direction;
                     platform.currentMove += platform.direction;
 
+                    // Move star with the platform if it exists and is active
+                    if (platform.star && platform.star.active) {
+                        platform.star.y += platform.direction;  // Move the star by the same amount as the platform
+                    }
                     // Reverse direction if the platform has moved its full amplitude in either direction
                     if (Math.abs(platform.currentMove) >= platform.distance) {
                         platform.direction *= -1;
                     }
-
-                      if (platform.star && platform.star.active) {
-                        const deltaY = platform.y - oldY;  // Calculate how much the platform has moved
-                    platform.star.y += deltaY;  // Move the star by the same amount
-            }
 
                 }
                  
