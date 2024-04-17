@@ -54,30 +54,23 @@
         let platIndex = 1;
         let platforms = [];
         const verticalGap = 120; // Set maximum vertical gap between platforms
+        const standardWidth = 100;
+        const widerWidth = 150;
         let baseY = canvas.height - 100;  // Starting Y position for the first platform
 
         for (let i = 0; i < 10; i++) {
             // Decrease the Y position by the verticalGap for each subsequent platform
             let newY = baseY - (verticalGap * i);
+            let isWider = Math.random() < 0.1;  // 10% chance of the platform being wider
+            let platformWidth = isWider ? widerWidth : standardWidth;
             let hasEnemy = Math.random() < 0.05; // 5% chance of having an enemy
             let enemy=null;
 
-            if (hasEnemy) {
-                let enemyType = Math.random() < 0.5 ? 'Type1' : 'Type2';
-                enemy = {
-                    type: enemyType,
-                    x: Math.random() * (100 - 80), // Random X within platform width
-                    y: -20, // Enemy is just above the platform
-                    speed: enemyType === 'Type2' ? (Math.random() * 2 - 1) * 2 : 0, // Only Type2 moves
-                    width: 20,
-                    height: 20
-                };
-            }
                     
             let potentialPlatform = {
-                x: Math.random() * (canvas.width - 50),  // Random X position
+                x: Math.random() * (canvas.width - platformWidth),  // Random X position
                 y: baseY - (verticalGap * i),                                 // Calculated Y position
-                width: 100,
+                width: platformWidth,
                 height: 10,
                 landed: false,
                 timeLanded: 0,
@@ -89,6 +82,17 @@
                 distance:25,// Maximum movement distance in pixels
                 direction:1, // Direction of movement: 1 for up, -1 for down
                 currentMove: 0  // Current position in the movement cycle
+            }
+            if (hasEnemy) {
+                let enemyType = Math.random() < 0.5 ? 'Type1' : 'Type2';
+                enemy = {
+                    type: enemyType,
+                    x: Math.random() * (100 - 80), // Random X within platform width
+                    y: -20, // Enemy is just above the platform
+                    speed: enemyType === 'Type2' ? (Math.random() * 2 - 1) * 2 : 0, // Only Type2 moves
+                    width: 20,
+                    height: 20
+                };
             }
 
                 
@@ -209,23 +213,12 @@
                 let newY = baseY - (verticalGap * i);
                 let hasEnemy = Math.random() < 0.05; // 5% chance of having an enemy
                 let enemy=null;
-
-                if (hasEnemy) {
-                    let enemyType = Math.random() < 0.5 ? 'Type1' : 'Type2';
-                    enemy = {
-                        type: enemyType,
-                        x: Math.random() * (100 - 80), // Random X within platform width
-                        y: -20, // Enemy is just above the platform
-                        speed: enemyType === 'Type2' ? (Math.random() * 2 - 1) * 2 : 0, // Only Type2 moves
-                        width: 20,
-                        height: 20
-                    };
-                }
-                        
+                let isWider = Math.random() < 0.1;  // 10% chance of the platform being wider
+                let platformWidth = isWider ? widerWidth : standardWidth;  // Choose width based on random chance      
                 let potentialPlatform = {
-                    x: Math.random() * (canvas.width - 50),  // Random X position
-                    y: baseY - (verticalGap * i),                                 // Calculated Y position
-                    width: 100,
+                    x: Math.random() * (canvas.width - platformWidth),  // Random X position
+                    y: baseY - (verticalGap * i),   // Calculated Y position
+                    width: platformWidth,
                     height: 10,
                     landed: false,
                     timeLanded: 0,
@@ -237,6 +230,17 @@
                     distance:25,// Maximum movement distance in pixels
                     direction:1, // Direction of movement: 1 for up, -1 for down
                     currentMove: 0  // Current position in the movement cycle
+                }
+                if (hasEnemy) {
+                    let enemyType = Math.random() < 0.5 ? 'Type1' : 'Type2';
+                    enemy = {
+                        type: enemyType,
+                        x: Math.random() * (100 - 80), // Random X within platform width
+                        y: -20, // Enemy is just above the platform
+                        speed: enemyType === 'Type2' ? (Math.random() * 2 - 1) * 2 : 0, // Only Type2 moves
+                        width: 20,
+                        height: 20
+                    };
                 }
 
 
@@ -300,7 +304,7 @@
                         platform.y = minY - verticalGap; // Place it above the highest current platform
                         platform.x = Math.random() * (canvas.width - platform.width); // New random x position
 
-                        if (Math.random() < 0.1) {  // Chance to add an enemy
+                        if (Math.random() < 0.05) {  // Chance to add an enemy
                             let enemyType = Math.random() < 0.5 ? 'Type1' : 'Type2';
                             platform.enemy = {
                                 type: enemyType,
