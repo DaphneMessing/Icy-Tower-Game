@@ -321,8 +321,7 @@
                         let overlaps;
                         do {
                             overlaps = false;
-                            //platform.y = minY - verticalGap; // Position above the highest platform
-                            //platform.x = Math.random() * (canvas.width - platform.width);
+
                             platforms.forEach(other => {
                             if (platform !== other && platform.x < other.x + other.width &&
                                 platform.x + platform.width > other.x &&
