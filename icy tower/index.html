@@ -507,14 +507,14 @@
             // Draw score
             ctx.font = " bold 16px Arial";
             ctx.fillStyle = "black";
-            ctx.fillText("Score= " + score, 10, 30); // Display the score at the top-left corner of the canvas
+            ctx.fillText("Score= " + score, 10, 50); // Display the score at the top-left corner of the canvas
             // Draw immunity time if player is immune
             if (player.immune && player.immunityTimeRemaining > 0) {
                 ctx.font = " bold 16px Arial";
                 ctx.fillStyle = "black";
                 // Convert milliseconds to seconds for display
                 const remainingSeconds = Math.floor(player.immunityTimeRemaining / 1000);
-                ctx.fillText(`Immunity= ${remainingSeconds}secodns`, 10, 50);  // Display in top-right corner
+                ctx.fillText(`Immunity= ${remainingSeconds}secodns`, 10, 70);  // Display in top-right corner
             }
             requestAnimationFrame(updateGame);
         }
