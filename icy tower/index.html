@@ -100,7 +100,6 @@
             }
             else if(hasStar){
             // Optionally add a star
-            
                 potentialPlatform.star = {
                     x: potentialPlatform.x + potentialPlatform.width / 2 - 10, // Center on platform
                     y: potentialPlatform.y - 20,  // Place above the platform
@@ -352,7 +351,6 @@ function loadImages() {
                         let minY = Math.min(...platforms.map(p => p.y));
                         platform.y = minY - verticalGap; // Place it above the highest current platform
                         platform.x = Math.random() * (canvas.width - platform.width); // New random x position
-
                         if (Math.random() < 0.05) {  // Chance to add an enemy
                             let enemyType = Math.random() < 0.5 ? 'Type1' : 'Type2';
                             platform.star = null; // No star on this platform
@@ -364,22 +362,21 @@ function loadImages() {
                                 width: 20,
                                 height: 20
                             };
-
-                        }else if(Math.random<0.2){
-                            platform.enemy = null;  // Clear enemy if not adding a new one
+                        }else{
+                            platform.enemy=null;
+                        }
+                        // Generate star only if no enemy
+                        if (!platform.enemy && Math.random() < 0.2) {  // Ensure stars are added with correct probability
                             platform.star = {
                                 x: platform.x + platform.width / 2 - 10,
-                                y: platform.y - 20,
+                                y: platform.y - 20,  // Adjust for new height
                                 width: 20,
                                 height: 20,
                                 active: true
                             };
+                        }else {
+                            platform.star = null; // Ensure no star if there is an enemy
                         }
-                        else{
-                            platform.enemy = null;
-                            platform.star = null; // No star on this platform
-                        }
-                        
 
                         let overlaps;
                         do {
@@ -522,8 +519,7 @@ function loadImages() {
             }
             // Remove platforms that have fallen below the canvas
             platforms = platforms.filter(platform => platform.y < canvas.height);
-               
-            
+                
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -531,47 +527,36 @@ function loadImages() {
             ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
 
             // Draw player
-            //ctx.fillStyle = 'red';
-            //ctx.fillRect(player.x, player.y, player.width, player.height);
             ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
 
-            // Draw platforms
-            // platforms.forEach((platform,index) => {
-            //     ctx.fillStyle = platform.falling ? 'gray' : 'black'; // Change color if falling
-            //     ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+            
              // Draw platforms
             platforms.forEach(platform => {
                 var platformImg = platform.width === 100 ? platformImage100 : platformImage150;
                 ctx.drawImage(platformImg, platform.x, platform.y, platform.width, platform.height);
             
-            
-
                 // Check if the platform index is divisible by 10 for labeling
                 if (platform.index % 10 === 0 || platform.index===1 ) {
+                    const label = "Platform " + platform.index;
                     ctx.fillStyle = "black"; // Set the text color
                     ctx.font = " bold 11px Arial"; // Set the font for the text
-                    ctx.fillText("Platform " + platform.index, platform.x + 10, platform.y + platform.height / 2 + 5);
+                    const textWidth = ctx.measureText(label).width;
+                    const textX = platform.x + (platform.width - textWidth) / 2; // Center text
+                    const textY = platform.y + 15; // Adjust text position to be visibly on the platform
+                    ctx.fillText(label, textX, textY);
                 }  
                 // Draw the star if it exists and is active
                 if (platform.star && platform.star.active) {
-                    // ctx.fillStyle = 'yellow';
-                    // ctx.fillRect(platform.star.x, platform.star.y, platform.star.width, platform.star.height);
                     ctx.drawImage(starImage, platform.star.x, platform.star.y, platform.star.width, platform.star.height);
                 }
 
-     
                 if (platform.enemy) {
                     if(platform.enemy.type === "Type1"){
                         ctx.drawImage(enemy1Image,platform.x + platform.enemy.x, platform.y + platform.enemy.y, platform.enemy.width, platform.enemy.height);
                     }
-
-
-
-                    if(platform.enemy.type === "Type2"){
+                    else{
                         ctx.drawImage(enemy2Image,platform.x + platform.enemy.x, platform.y + platform.enemy.y, platform.enemy.width, platform.enemy.height);
                     }
-                //     ctx.fillStyle = platform.enemy.type === "Type1" ? 'red' : 'green';
-                //     ctx.fillRect(platform.x + platform.enemy.x, platform.y + platform.enemy.y, platform.enemy.width, platform.enemy.height);
                  }
             });
 
