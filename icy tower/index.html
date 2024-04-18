@@ -24,7 +24,6 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-
         // Game settings
         const gravity = 0.5;
         const friction = 0.8;
@@ -33,10 +32,7 @@
         let score=0;
         let isGameOver = false;
         let scores=[];
-       
 
-
-    
         // Player
         let player = {
             x: canvas.width / 2,
@@ -51,7 +47,6 @@
             immunityTimeRemaining: 0 // Time remaining in millisecond
         };
 
-
         // Platforms
         let platIndex = 1;
         let platforms = [];
@@ -59,7 +54,6 @@
         const standardWidth = 100;
         const widerWidth = 150;
         let baseY = canvas.height - 100;  // Starting Y position for the first platform
-
         for (let i = 0; i < 10; i++) {
             // Decrease the Y position by the verticalGap for each subsequent platform
             let newY = baseY - (verticalGap * i);
@@ -67,9 +61,7 @@
             let platformWidth = isWider ? widerWidth : standardWidth;
             let hasEnemy = Math.random() < 0.05; // 5% chance of having an enemy
             let enemy=null;
-            let hasStar = Math.random() < 0.2;  // 20% chance of having a star
-
-                    
+            let hasStar = Math.random() < 0.2;  // 20% chance of having a star       
             let potentialPlatform = {
                 x: Math.random() * (canvas.width - platformWidth),  // Random X position
                 y: baseY - (verticalGap * i),                                 // Calculated Y position
@@ -123,10 +115,8 @@
                     potentialPlatform.y -= verticalGap; // Move up further if there is an overlap
                 }
             }
-
             platforms.push(potentialPlatform);
         }
-
         // Key Listener
         let keys = [];
         window.addEventListener('keydown', function(e) {
@@ -140,15 +130,11 @@
             keys[e.keyCode] = false;
         });
 
-
-
-
-    // Ensure all images are loaded before starting the game
-    window.onload = function() {
-        loadImages();
-        requestAnimationFrame(updateGame);  // Start the game loop
-    };
-
+        // Ensure all images are loaded before starting the game
+        window.onload = function() {
+            loadImages();
+            requestAnimationFrame(updateGame);  // Start the game loop
+        };
         
         function saveScore(newScore) {
             scores.push(newScore); // Add the new score to the array
@@ -156,77 +142,68 @@
             scores = scores.slice(0, 10); // Keep only the top 10 scores
         }
 
-    function gameOver() {
-        isGameOver = true;
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas for game over message
-        ctx.fillStyle = "white";
-        ctx.fillStyle = "red";
-        ctx.font = " bold 30px Arial";
-        ctx.fillText("GAME OVER",100,45);
-        saveScore(score);
+        function gameOver() {
+            isGameOver = true;
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas for game over message
+            ctx.fillStyle = "white";
+            ctx.fillStyle = "red";
+            ctx.font = " bold 30px Arial";
+            ctx.fillText("GAME OVER",100,45);
+            saveScore(score);
+            // Set a timeout to show scores and restart option after a delay
+            setTimeout(() => {
+                displayScoresAndRestartOption();
+            }, 500); // 1 second delay  
+        }
 
-        // Set a timeout to show scores and restart option after a delay
-        setTimeout(() => {
-            displayScoresAndRestartOption();
-        }, 500); // 1 second delay
-        
-    }
-
-    function displayScoresAndRestartOption() {
-    ctx.fillStyle = "darkblue";
-    ctx.fillRect(50, 50, canvas.width - 100, canvas.height - 100); // Background for scores
-    ctx.fillStyle = "white";
-    ctx.font = "20px Arial";
-    ctx.fillText("Top Scores:", 70, 90); // Title for scores
-    scores.forEach((score, index) => {
-        ctx.fillText(`${index + 1}. ${score}`, 70, 120 + 30 * index); // List scores
-    });
-
+        function displayScoresAndRestartOption() {
+            ctx.fillStyle = "darkblue";
+            ctx.fillRect(50, 50, canvas.width - 100, canvas.height - 100); // Background for scores
+            ctx.fillStyle = "white";
+            ctx.font = "20px Arial";
+            ctx.fillText("Top Scores:", 70, 90); // Title for scores
+            scores.forEach((score, index) => {
+                ctx.fillText(`${index + 1}. ${score}`, 70, 120 + 30 * index); // List scores
+            });
             // Draw the 'Play again' button
             ctx.fillStyle = "white";
             ctx.fillRect(140, canvas.height / 2 + 150, 110, 40); // Button rectangle
             ctx.fillStyle = "black";
             ctx.font = "20px Arial";
             ctx.fillText("Play again", 150, canvas.height / 2 + 175); // Button text
-
-
             canvas.addEventListener('click', function handleClick(event) {
-                const mouseX = event.clientX - canvas.offsetLeft;
-                const mouseY = event.clientY - canvas.offsetTop;
-
-                // Calculate the bottom boundary of the canvas dynamically
+                const rect = canvas.getBoundingClientRect();  // Get the bounding rectangle of the canvas
+                const scaleX = canvas.width / rect.width;    // Relationship bitmap vs. element for X
+                const scaleY = canvas.height / rect.height;  // Relationship bitmap vs. element for Y
+                const mouseX = (event.clientX - rect.left) * scaleX;  // Scale mouse coordinates after they have
+                const mouseY = (event.clientY - rect.top) * scaleY;   // been adjusted to be relative to element
                 const canvasMiddleY = canvas.height / 2;
-
-               // Check if the click is within the button's bounding box
-               if (mouseX >= 140 && mouseX <= 250 && // 140 + 110 (width of the button)
+                // Check if the click is within the button's bounding box
+                if (mouseX >= 140 && mouseX <= 250 &&  // 140 + 110 (width of the button)
                     mouseY >= canvasMiddleY + 150 && mouseY <= canvasMiddleY + 190) { // 150 + 40 (height of the button)
                     canvas.removeEventListener('click', handleClick); // Prevent multiple triggers
                     restartGame();
                 }
             }, { once: true });
+        } 
 
-
-} 
-// Load images
-function loadImages() {
-    bgImage = new Image();
-    bgImage.src = 'darksky.png';  
-    playerImage = new Image();
-    playerImage.src = 'supermario.png'; 
-    platformImage100 = new Image();
-    platformImage100.src = 'cloud100.png';  
-    platformImage150 = new Image();
-    platformImage150.src = 'cloud150.png';  
-    starImage = new Image();
-    starImage.src = 'star.png'; 
-    enemy1Image = new Image();
-    enemy1Image.src= 'enemy1.png';
-    enemy2Image = new Image();
-    enemy2Image.src= 'enemy2.png';
-}
-
-
- 
+        // Load images
+        function loadImages() {
+            bgImage = new Image();
+            bgImage.src = 'darksky.png';  
+            playerImage = new Image();
+            playerImage.src = 'supermario.png'; 
+            platformImage100 = new Image();
+            platformImage100.src = 'cloud100.png';  
+            platformImage150 = new Image();
+            platformImage150.src = 'cloud150.png';  
+            starImage = new Image();
+            starImage.src = 'star.png'; 
+            enemy1Image = new Image();
+            enemy1Image.src= 'enemy1.png';
+            enemy2Image = new Image();
+            enemy2Image.src= 'enemy2.png';
+        }
         function restartGame() {
             isGameOver = false;
             score = 0;
@@ -277,8 +254,6 @@ function loadImages() {
                         height: 20
                     };
                 }else if(hasStar){
-                // Optionally add a star
-                // if (hasStar) {
                     potentialPlatform.star = {
                         x: potentialPlatform.x + potentialPlatform.width / 2 - 10, // Center on platform
                         y: potentialPlatform.y - 20,  // Place above the platform
@@ -287,8 +262,6 @@ function loadImages() {
                         active: true
                     };
                 }
-
-
                 // Check for vertical overlaps and adjust
                 let validPosition = false;
                 while (!validPosition) {
@@ -303,19 +276,15 @@ function loadImages() {
                         potentialPlatform.y -= verticalGap; // Move up further if there is an overlap
                     }
                 }
-
                 platforms.push(potentialPlatform);
             }
-
             updateGame();
-
         }
 
         function updateGame() {
             if (isGameOver) {
             return; // Stop the game update loop if the game is over
-            }
-              
+            } 
             // Check key inputs
             if (keys[39]) { // right arrow
                 if (player.velX < player.speed) {
@@ -327,13 +296,10 @@ function loadImages() {
                     player.velX--;
                 }
             }
-
             player.velX *= friction;
             player.velY += gravity;
-
             player.x += player.velX;
             player.y += player.velY;
-
             // Screen scroll
             if (player.y < canvas.height / 4) {
                 let deltaY = Math.abs(player.velY);
@@ -398,7 +364,6 @@ function loadImages() {
                         platform.index = platIndex++;
                     }
                 });
-            
 
             // Collision with the canvas edges
             if (player.x >= canvas.width - player.width) {
@@ -413,15 +378,12 @@ function loadImages() {
                 player.velY = 0;
             }
             // Platform collision
-            
             platforms.forEach(platform => {
-
                 // Handle moving platforms
                 if (platform.moving) {
                     const oldY = platform.y;  // Store old y position to calculate movement delta
                     platform.y += platform.direction;
                     platform.currentMove += platform.direction;
-
                     // Move star with the platform if it exists and is active
                     if (platform.star && platform.star.active) {
                         platform.star.y += platform.direction;  // Move the star by the same amount as the platform
@@ -430,37 +392,28 @@ function loadImages() {
                     if (Math.abs(platform.currentMove) >= platform.distance) {
                         platform.direction *= -1;
                     }
-
                 }
-                 
                 if (
                     player.x < platform.x + platform.width &&
                     player.x + player.width > platform.x &&
                     player.y + player.height > platform.y &&
                     player.y + player.height < platform.y + platform.height &&
                     player.velY >= 0
-                ) {
-                   
+                ) {  
                     player.jumping = false;
                     player.velY = 0;
-                    player.y = platform.y - player.height;
-                    
+                    player.y = platform.y - player.height;    
                     if (!platform.landed){
                         platform.landed = true; //mark as landed 
                         if(platform.index>landedIndex) { // Check if the platform was landed on before and if it's higher than the last platform that player landed on
                             landedIndex=platform.index //update the highest platform that player landed on
                             score++; // Increment score if landing on a new platform
                         }
-                    }
-                    
-                    platform.timeLanded += 1 / 60;  // Increment time only for the platform the player is on
-                        
-                    
+                    }  
+                    platform.timeLanded += 1 / 60;  // Increment time only for the platform the player is on   
                     if (platform.timeLanded >= 3 && !platform.falling) {
                         platform.falling = true;  // Mark the platform as falling after 3 seconds
                     }
-        
-
                 }else{
                         platform.timeLanded =0; // Reset time if the player is not on the platform
                 }
@@ -468,7 +421,6 @@ function loadImages() {
                 if (platform.falling) {
                         platform.y += 5;  // Accelerate the fall
                 }
-
                 // Check star collision with player
                 if (platform.star && platform.star.active && player.x < platform.star.x + platform.star.width &&
                     player.x + player.width > platform.star.x &&
@@ -478,9 +430,6 @@ function loadImages() {
                     player.immune = true;  // Grant immunity
                     player.immunityTimeRemaining = 8000;  // Reset the immunity time to 8 seconds
                 }
-
-
-
                 if (platform.enemy) {
                     if (platform.enemy.type === "Type2") {
                     // Move the enemy side to side on the platform
@@ -490,8 +439,7 @@ function loadImages() {
                         }
                         platform.enemy.x += platform.enemy.speed; // Update position
                     }
-
-                     // Check enemy collision with player
+                    // Check enemy collision with player
                     if (player.x < platform.x + platform.enemy.x + platform.enemy.width &&
                         player.x + player.width > platform.x + platform.enemy.x &&
                         player.y < platform.y + platform.enemy.y + platform.enemy.height &&
@@ -509,10 +457,8 @@ function loadImages() {
                                 return;
                             }
                     }
-                }
-                
-            }); 
-                    
+                }   
+            });        
             if (player.y+ player.height >= canvas.height && score>0) {
                     gameOver();
                     return;
@@ -534,7 +480,6 @@ function loadImages() {
             platforms.forEach(platform => {
                 var platformImg = platform.width === 100 ? platformImage100 : platformImage150;
                 ctx.drawImage(platformImg, platform.x, platform.y, platform.width, platform.height);
-            
                 // Check if the platform index is divisible by 10 for labeling
                 if (platform.index % 10 === 0 || platform.index===1 ) {
                     const label = "Platform " + platform.index;
@@ -549,7 +494,6 @@ function loadImages() {
                 if (platform.star && platform.star.active) {
                     ctx.drawImage(starImage, platform.star.x, platform.star.y, platform.star.width, platform.star.height);
                 }
-
                 if (platform.enemy) {
                     if(platform.enemy.type === "Type1"){
                         ctx.drawImage(enemy1Image,platform.x + platform.enemy.x, platform.y + platform.enemy.y, platform.enemy.width, platform.enemy.height);
@@ -572,12 +516,8 @@ function loadImages() {
                 const remainingSeconds = Math.floor(player.immunityTimeRemaining / 1000);
                 ctx.fillText(`Immunity= ${remainingSeconds}secodns`, 10, 50);  // Display in top-right corner
             }
-
             requestAnimationFrame(updateGame);
-        
-    }
-    
-
+        }
         updateGame();
     </script>
 </body>
