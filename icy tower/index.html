@@ -40,9 +40,9 @@
         // Player
         let player = {
             x: canvas.width / 2,
-            y: canvas.height - 20,
-            width: 20,
-            height: 20,
+            y: canvas.height - 50,
+            width: 50,
+            height: 50,
             speed: 5,
             velX: 0,
             velY: 0,
@@ -55,7 +55,7 @@
         // Platforms
         let platIndex = 1;
         let platforms = [];
-        const verticalGap = 120; // Set maximum vertical gap between platforms
+        const verticalGap = 130; // Set maximum vertical gap between platforms
         const standardWidth = 100;
         const widerWidth = 150;
         let baseY = canvas.height - 100;  // Starting Y position for the first platform
@@ -74,7 +74,7 @@
                 x: Math.random() * (canvas.width - platformWidth),  // Random X position
                 y: baseY - (verticalGap * i),                                 // Calculated Y position
                 width: platformWidth,
-                height: 10,
+                height: 20,
                 landed: false,
                 timeLanded: 0,
                 falling: false,
@@ -91,7 +91,7 @@
                 let enemyType = Math.random() < 0.5 ? 'Type1' : 'Type2';
                 enemy = {
                     type: enemyType,
-                    x: Math.random() * (100 - 80), // Random X within platform width
+                    x: Math.random() * (potentialPlatform.width - 20), // Random X within platform width
                     y: -20, // Enemy is just above the platform
                     speed: enemyType === 'Type2' ? (Math.random() * 2 - 1) * 2 : 0, // Only Type2 moves
                     width: 20,
@@ -141,6 +141,15 @@
             keys[e.keyCode] = false;
         });
 
+
+
+
+    // Ensure all images are loaded before starting the game
+    window.onload = function() {
+        loadImages();
+        requestAnimationFrame(updateGame);  // Start the game loop
+    };
+
         
         function saveScore(newScore) {
             scores.push(newScore); // Add the new score to the array
@@ -153,26 +162,20 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas for game over message
         ctx.fillStyle = "white";
         ctx.fillStyle = "red";
-        ctx.font = "30px Arial";
+        ctx.font = " bold 30px Arial";
         ctx.fillText("GAME OVER",100,45);
         saveScore(score);
 
         // Set a timeout to show scores and restart option after a delay
         setTimeout(() => {
             displayScoresAndRestartOption();
-        }, 1000); // 1 second delay
+        }, 500); // 1 second delay
         
     }
 
     function displayScoresAndRestartOption() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas for the scores screen
     ctx.fillStyle = "darkblue";
     ctx.fillRect(50, 50, canvas.width - 100, canvas.height - 100); // Background for scores
-
-    // Display the top scores
-    ctx.fillStyle = "red";
-    ctx.font = "30px Arial";
-    ctx.fillText("GAME OVER",100,45);
     ctx.fillStyle = "white";
     ctx.font = "20px Arial";
     ctx.fillText("Top Scores:", 70, 90); // Title for scores
@@ -204,13 +207,32 @@
             }, { once: true });
 
 
+} 
+// Load images
+function loadImages() {
+    bgImage = new Image();
+    bgImage.src = 'darksky.png';  
+    playerImage = new Image();
+    playerImage.src = 'supermario.png'; 
+    platformImage100 = new Image();
+    platformImage100.src = 'cloud100.png';  
+    platformImage150 = new Image();
+    platformImage150.src = 'cloud150.png';  
+    starImage = new Image();
+    starImage.src = 'star.png'; 
+    enemy1Image = new Image();
+    enemy1Image.src= 'enemy1.png';
+    enemy2Image = new Image();
+    enemy2Image.src= 'enemy2.png';
 }
-       
+
+
+ 
         function restartGame() {
             isGameOver = false;
             score = 0;
             player.x = canvas.width / 2;
-            player.y = canvas.height - 20;
+            player.y = canvas.height - 50;
             player.jumping = false;
             player.immune= false;
             player.immunityTimeRemaining= 0; 
@@ -232,7 +254,7 @@
                     x: Math.random() * (canvas.width - platformWidth),  // Random X position
                     y: baseY - (verticalGap * i),   // Calculated Y position
                     width: platformWidth,
-                    height: 10,
+                    height: 20,
                     landed: false,
                     timeLanded: 0,
                     falling: false,
@@ -249,7 +271,7 @@
                     let enemyType = Math.random() < 0.5 ? 'Type1' : 'Type2';
                     enemy = {
                         type: enemyType,
-                        x: Math.random() * (100 - 80), // Random X within platform width
+                        x: Math.random() * (potentialPlatform.width - 20), // Random X within platform width
                         y: -20, // Enemy is just above the platform
                         speed: enemyType === 'Type2' ? (Math.random() * 2 - 1) * 2 : 0, // Only Type2 moves
                         width: 20,
@@ -336,7 +358,7 @@
                             platform.star = null; // No star on this platform
                             platform.enemy = {
                                 type: enemyType,
-                                x: Math.random() * (platform.width - 80),
+                                x: Math.random() * (platform.width - 20),
                                 y: -20, 
                                 speed: enemyType === 'Type2' ? (Math.random() * 2 - 1) * 2 : 0,
                                 width: 20,
@@ -505,44 +527,61 @@
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-
+            // Draw the background
+            ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
 
             // Draw player
-            ctx.fillStyle = 'red';
-            ctx.fillRect(player.x, player.y, player.width, player.height);
+            //ctx.fillStyle = 'red';
+            //ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
 
             // Draw platforms
-            platforms.forEach((platform,index) => {
-                ctx.fillStyle = platform.falling ? 'gray' : 'black'; // Change color if falling
-                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+            // platforms.forEach((platform,index) => {
+            //     ctx.fillStyle = platform.falling ? 'gray' : 'black'; // Change color if falling
+            //     ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+             // Draw platforms
+            platforms.forEach(platform => {
+                var platformImg = platform.width === 100 ? platformImage100 : platformImage150;
+                ctx.drawImage(platformImg, platform.x, platform.y, platform.width, platform.height);
+            
             
 
                 // Check if the platform index is divisible by 10 for labeling
                 if (platform.index % 10 === 0 || platform.index===1 ) {
-                    ctx.fillStyle = "yellow"; // Set the text color
-                    ctx.font = "14px Arial"; // Set the font for the text
+                    ctx.fillStyle = "black"; // Set the text color
+                    ctx.font = " bold 11px Arial"; // Set the font for the text
                     ctx.fillText("Platform " + platform.index, platform.x + 10, platform.y + platform.height / 2 + 5);
                 }  
                 // Draw the star if it exists and is active
                 if (platform.star && platform.star.active) {
-                    ctx.fillStyle = 'yellow';
-                    ctx.fillRect(platform.star.x, platform.star.y, platform.star.width, platform.star.height);
+                    // ctx.fillStyle = 'yellow';
+                    // ctx.fillRect(platform.star.x, platform.star.y, platform.star.width, platform.star.height);
+                    ctx.drawImage(starImage, platform.star.x, platform.star.y, platform.star.width, platform.star.height);
                 }
 
      
                 if (platform.enemy) {
-                    ctx.fillStyle = platform.enemy.type === "Type1" ? 'red' : 'green';
-                    ctx.fillRect(platform.x + platform.enemy.x, platform.y + platform.enemy.y, platform.enemy.width, platform.enemy.height);
-                }
+                    if(platform.enemy.type === "Type1"){
+                        ctx.drawImage(enemy1Image,platform.x + platform.enemy.x, platform.y + platform.enemy.y, platform.enemy.width, platform.enemy.height);
+                    }
+
+
+
+                    if(platform.enemy.type === "Type2"){
+                        ctx.drawImage(enemy2Image,platform.x + platform.enemy.x, platform.y + platform.enemy.y, platform.enemy.width, platform.enemy.height);
+                    }
+                //     ctx.fillStyle = platform.enemy.type === "Type1" ? 'red' : 'green';
+                //     ctx.fillRect(platform.x + platform.enemy.x, platform.y + platform.enemy.y, platform.enemy.width, platform.enemy.height);
+                 }
             });
 
             // Draw score
-            ctx.font = "16px Arial";
+            ctx.font = " bold 16px Arial";
             ctx.fillStyle = "black";
             ctx.fillText("Score= " + score, 10, 30); // Display the score at the top-left corner of the canvas
             // Draw immunity time if player is immune
             if (player.immune && player.immunityTimeRemaining > 0) {
-                ctx.font = "16px Arial";
+                ctx.font = " bold 16px Arial";
                 ctx.fillStyle = "black";
                 // Convert milliseconds to seconds for display
                 const remainingSeconds = Math.floor(player.immunityTimeRemaining / 1000);
