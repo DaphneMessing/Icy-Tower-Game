@@ -36,7 +36,7 @@
         // Player
         let player = {
             x: canvas.width / 2,
-            y: canvas.height - 50,
+            y: canvas.height - 100,
             width: 50,
             height: 50,
             speed: 5,
@@ -147,8 +147,8 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas for game over message
             ctx.fillStyle = "white";
             ctx.fillStyle = "red";
-            ctx.font = " bold 30px Arial";
-            ctx.fillText("GAME OVER",100,45);
+            ctx.font = " bold 25px Arial";
+            ctx.fillText("GAME OVER",120,45);
             saveScore(score);
             // Set a timeout to show scores and restart option after a delay
             setTimeout(() => {
@@ -165,26 +165,34 @@
             scores.forEach((score, index) => {
                 ctx.fillText(`${index + 1}. ${score}`, 70, 120 + 30 * index); // List scores
             });
+        
             // Draw the 'Play again' button
+            const buttonX = 140;
+            const buttonY = canvas.height / 2 + 150;
+            const buttonWidth = 120;
+            const buttonHeight = 40;
             ctx.fillStyle = "white";
-            ctx.fillRect(140, canvas.height / 2 + 150, 110, 40); // Button rectangle
+            ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight); // Button rectangle
             ctx.fillStyle = "black";
             ctx.font = "20px Arial";
-            ctx.fillText("Play again", 150, canvas.height / 2 + 175); // Button text
-            canvas.addEventListener('click', function handleClick(event) {
-                const rect = canvas.getBoundingClientRect();  // Get the bounding rectangle of the canvas
-                const scaleX = canvas.width / rect.width;    // Relationship bitmap vs. element for X
-                const scaleY = canvas.height / rect.height;  // Relationship bitmap vs. element for Y
-                const mouseX = (event.clientX - rect.left) * scaleX;  // Scale mouse coordinates after they have
-                const mouseY = (event.clientY - rect.top) * scaleY;   // been adjusted to be relative to element
-                const canvasMiddleY = canvas.height / 2;
+            ctx.fillText("Play again", buttonX + 10, buttonY + 25); // Button text
+
+            function handleClick(event) {
+                const rect = canvas.getBoundingClientRect(); // Get the bounding rectangle of the canvas
+                const scaleX = canvas.width / rect.width; // Relationship bitmap vs. element for X
+                const scaleY = canvas.height / rect.height; // Relationship bitmap vs. element for Y
+                const mouseX = (event.clientX - rect.left) * scaleX; // Scale mouse coordinates after they have been adjusted to be relative to element
+                const mouseY = (event.clientY - rect.top) * scaleY; // Scale mouse coordinates after they have been adjusted to be relative to element
+
                 // Check if the click is within the button's bounding box
-                if (mouseX >= 140 && mouseX <= 250 &&  // 140 + 110 (width of the button)
-                    mouseY >= canvasMiddleY + 150 && mouseY <= canvasMiddleY + 190) { // 150 + 40 (height of the button)
-                    canvas.removeEventListener('click', handleClick); // Prevent multiple triggers
+                if (mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
+                    mouseY >= buttonY && mouseY <= buttonY + buttonHeight) {
+                    canvas.removeEventListener('click', handleClick); // Remove event listener to prevent multiple triggers
                     restartGame();
                 }
-            }, { once: true });
+            }
+
+            canvas.addEventListener('click', handleClick, { once: true });
         } 
 
         // Load images
