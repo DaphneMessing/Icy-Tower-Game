@@ -39,7 +39,7 @@ This project is a creatively modified version of a classic platformer game inspi
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/platformer-game-enhancement.git
+   git clone https://github.com/DaphneMessing/Icy-Tower-Game.git
    ```
 2. Open the project in **Visual Studio Code** or your preferred editor.
 3. Install the "Live Server" extension in Visual Studio Code.
